@@ -1,0 +1,96 @@
+
+
+services:
+  usuario-service:
+    build: ./usuario-service/usuario-service
+    container_name: usuario-service
+    ports:
+      - "8081:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://usuarios-db:5432/usuarios_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - usuarios-db
+    networks:
+      - net-usuario
+
+  salas-service:
+    build: ./salas-service/salas-service
+    container_name: salas-service
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://salas-db:5432/salas_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - salas-db
+    networks:
+      - net-sala
+
+  reserva-service:
+    build: ./reserva-service/reserva-service
+    container_name: reserva-service
+    ports:
+      - "8083:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://reservas-db:5432/reservas_db
+      - SPRING_DATASOURCE_USERNAME=admin
+      - SPRING_DATASOURCE_PASSWORD=admin
+    depends_on:
+      - reservas-db
+    networks:
+      - net-reserva
+
+  usuarios-db:
+    image: postgres:latest
+    container_name: usuarios-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: usuarios_db
+    ports:
+      - "5433:5432"
+    networks:
+      - net-usuario
+
+  salas-db:
+    image: postgres:latest
+    container_name: salas-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: salas_db
+    ports:
+      - "5434:5432"
+    networks:
+      - net-sala
+
+  reservas-db:
+    image: postgres:latest
+    container_name: reservas-db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: reservas_db
+    ports:
+      - "5435:5432"
+    networks:
+      - net-reserva
+
+  adminer:
+    image: adminer
+    container_name: adminer
+    restart: always
+    ports:
+      - "8080:8080"
+    networks:
+      - net-usuario
+      - net-sala
+      - net-reserva
+
+networks:
+  net-usuario:
+  net-sala:
+  net-reserva:
