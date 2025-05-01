@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public class CreateBookingRequest {
     private Long roomId;
     private Long userId;
-    private LocalDateTime init;
-    private LocalDateTime end;
+    private LocalDateTime initDate;
+    private LocalDateTime endDate;
 }
 
