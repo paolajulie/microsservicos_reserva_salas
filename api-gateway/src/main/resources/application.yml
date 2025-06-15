@@ -8,21 +8,21 @@ spring:
     gateway:
       routes:
         - id: usuario-service
-          uri: lb://USUARIO-SERVICE
+          uri: lb://usuario-service
           predicates:
             - Path=/api/users/**
           filters:
             - StripPrefix=1
 
         - id: salas-service
-          uri: lb://SALAS-SERVICE
+          uri: lb://salas-service
           predicates:
             - Path=/api/rooms/**
           filters:
             - StripPrefix=1
 
         - id: reserva-service
-          uri: lb://RESERVA-SERVICE
+          uri: lb://reserva-service
           predicates:
             - Path=/api/bookings/**
           filters:
