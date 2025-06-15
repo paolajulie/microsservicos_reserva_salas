@@ -1,0 +1,40 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: usuario-service
+          uri: lb://USUARIO-SERVICE
+          predicates:
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
+
+        - id: salas-service
+          uri: lb://SALAS-SERVICE
+          predicates:
+            - Path=/api/rooms/**
+          filters:
+            - StripPrefix=1
+
+        - id: reserva-service
+          uri: lb://RESERVA-SERVICE
+          predicates:
+            - Path=/api/bookings/**
+          filters:
+            - StripPrefix=1
+
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka-server:8761/eureka/ 

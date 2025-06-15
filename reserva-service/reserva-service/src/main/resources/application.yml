@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: reserva-service
+  datasource:
+    url: jdbc:postgresql://reservas-db:5432/reservas_db
+    username: admin
+    password: admin
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  rabbitmq:
+    host: rabbitmq
+    port: 5672
+    username: guest
+    password: guest
+  cloud:
+    stream:
+      function:
+        definition: reservaCriadaSupplier;reservaCanceladaSupplier;reservaModificadaSupplier;usuarioEventConsumer
+      bindings:
+        reservaCriadaSupplier-out-0:
+          destination: reserva.criada
+        reservaCanceladaSupplier-out-0:
+          destination: reserva.cancelada
+        reservaModificadaSupplier-out-0:
+          destination: reserva.modificada
+        usuarioEventConsumer-in-0:
+          destination: usuario.eventos
+          group: reserva-service
+      rabbit:
+        bindings:
+          reservaCriadaSupplier-out-0:
+            producer:
+              routing-key-expression: "'reserva.criada'"
+          reservaCanceladaSupplier-out-0:
+            producer:
+              routing-key-expression: "'reserva.cancelada'"
+          reservaModificadaSupplier-out-0:
+            producer:
+              routing-key-expression: "'reserva.modificada'"
+          usuarioEventConsumer-in-0:
+            consumer:
+              binding-routing-key: usuario.deletado
+              auto-bind-dlq: true
+              dlq-ttl: 5000
+              republish-to-dlq: true
+  main:
+    allow-bean-definition-overriding: true
+
+server:
+  port: 8083
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-server:8761/eureka/
+  instance:
+    prefer-ip-address: false 

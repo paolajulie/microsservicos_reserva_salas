@@ -1,6 +1,37 @@
-
-
 services:
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - eureka-server
+      - rabbitmq
+    networks:
+      - net-gateway
+
+  eureka-server:
+    build: ./eureka-server
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
+    environment:
+      - JAVA_OPTS=-Xmx512m
+    networks:
+      - net-gateway
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    networks:
+      - net-gateway
+
   usuario-service:
     build: ./usuario-service/usuario-service
     container_name: usuario-service
@@ -10,10 +41,15 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://usuarios-db:5432/usuarios_db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
       - usuarios-db
+      - eureka-server
+      - rabbitmq
     networks:
       - net-usuario
+      - net-gateway
 
   salas-service:
     build: ./salas-service/salas-service
@@ -24,10 +60,15 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://salas-db:5432/salas_db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
       - salas-db
+      - eureka-server
+      - rabbitmq
     networks:
       - net-sala
+      - net-gateway
 
   reserva-service:
     build: ./reserva-service/reserva-service
@@ -38,13 +79,18 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://reservas-db:5432/reservas_db
       - SPRING_DATASOURCE_USERNAME=admin
       - SPRING_DATASOURCE_PASSWORD=admin
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - SPRING_RABBITMQ_HOST=rabbitmq
     depends_on:
       - reservas-db
+      - eureka-server
+      - rabbitmq
     networks:
       - net-reserva
+      - net-gateway
 
   usuarios-db:
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: usuarios-db
     environment:
       POSTGRES_USER: admin
@@ -56,7 +102,7 @@ services:
       - net-usuario
 
   salas-db:
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: salas-db
     environment:
       POSTGRES_USER: admin
@@ -68,7 +114,7 @@ services:
       - net-sala
 
   reservas-db:
-    image: postgres:latest
+    image: postgres:15-alpine
     container_name: reservas-db
     environment:
       POSTGRES_USER: admin
@@ -80,11 +126,11 @@ services:
       - net-reserva
 
   adminer:
-    image: adminer
+    image: adminer:latest
     container_name: adminer
     restart: always
     ports:
-      - "8080:8080"
+      - "8084:8080"
     networks:
       - net-usuario
       - net-sala
@@ -94,3 +140,4 @@ networks:
   net-usuario:
   net-sala:
   net-reserva:
+  net-gateway:

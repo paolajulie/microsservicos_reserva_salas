@@ -1,14 +1,11 @@
-# Usar a imagem oficial do OpenJDK 17
-FROM openjdk:17-jdk-slim
-
-# Define o diretório de trabalho dentro do container
+FROM maven:3.8.4-openjdk-17-slim AS build
 WORKDIR /app
+COPY pom.xml .
+COPY src ./src
+RUN mvn clean package -DskipTests
 
-# Copia o arquivo JAR do microserviço para dentro do container
-COPY target/*.jar app.jar
-
-# Expõe a porta do serviço
+FROM openjdk:17-slim
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
 EXPOSE 8080
-
-# Comando para rodar a aplicação
 ENTRYPOINT ["java", "-jar", "app.jar"]
