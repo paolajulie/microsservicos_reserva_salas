@@ -55,7 +55,7 @@ Este projeto implementa um sistema de reserva de salas usando uma arquitetura de
 
 1. **Clone o repositório**
    ```bash
-   git clone [URL_DO_REPOSITÓRIO]
+   git clone https://github.com/paolajulie/microsservicos_reserva_salas.git
    cd microsservicos_reserva_salas
    ```
 
